@@ -1,0 +1,13 @@
+/*.container {
+  display: flex;
+  justify-content: center;
+}*/
+
+.instrument {
+  width: 75px;
+}
+
+#bpm {
+	width: 50px;
+}
+
