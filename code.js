@@ -19,7 +19,6 @@ $("document").ready(function(){
   // BUILDERS ------------------------------------- 
 
   const buildDOMGrid = function(bars, resolution) {
-    console.log('building grid');
     let stepsPerBeat = resolution / 4;
     let beats = bars * 4;
 
@@ -32,9 +31,10 @@ $("document").ready(function(){
       for(let i=1; i<=beats; i++) {
         let beatGroup = $("<div></div>").addClass('beat-group');
         for(let k=1; k<=stepsPerBeat; k++) {
+          let stepNum = ((i-1)*4)+k
           let pad = $(`<button>${i}</button>`)
             .addClass('btn btn-default pad')
-            .data('step', k);          
+            .data('step', stepNum);          
           beatGroup.append(pad)
           instrumentDiv.append(beatGroup);
         }
@@ -47,31 +47,33 @@ $("document").ready(function(){
   };
 
   // ON PAGE LOAD -------------------------------
-    const steps = buildStepsArray();
+    let steps = buildStepsArray();
+    console.log(steps);
     buildDOMGrid(1, 16);  
 
   // EVENT HANDLERS -----------------------------
   $(".pad").click(function(){
-    console.log($(this).data());
     let stepIndex = Number($(this).data().step)-1;
-    let instrument = $(this).parent().data().instrument;
-  	if(steps[stepIndex].instrument) {
+    let instrument = $(this).parent().parent().data().instrument;
+  	if(steps[stepIndex][instrument]) {
       console.log(`deactivated ${instrument} pad on step ${stepIndex+1}`)
   	  deactivatePad(stepIndex, instrument);
+      unilluminatePad($(this));
     } else {
       console.log(`activated ${instrument} pad on step ${stepIndex+1}`)
       activatePad(stepIndex, instrument);
-      let audio = new Audio(samples.kick);
-      audio.play(); 
+      illuminatePad($(this));
+      new Audio(samples[instrument]).play();
     }
   });
 
   $(".play").click(function(){
-  	console.log('clicked the play button!')
     if(transportOn) {
-	  deactivateTransport();
+    console.log('clicked the stop button!')      
+	  deactivateTransport($(this));
     } else {
-	  activateTransport();
+    console.log('clicked the play button!')      
+	  activateTransport($(this));
     }     
   });
 
@@ -81,48 +83,58 @@ $("document").ready(function(){
   }
 
   const activatePad = function(stepIndex, instrument) {
-    steps[stepIndex].instrument = true;
-    // illuminate pad
+    // console.log('grid before\n', steps);
+    // console.log('stepIndex:', stepIndex);
+    // console.log('instrument:', instrument);
+    steps[stepIndex][instrument] = true;
+    // console.log('grid after\n', steps);
   };
 
   const deactivatePad = function(stepIndex, instrument) {
-    steps[stepIndex].instrument = false;
+    // console.log('grid before\n', steps);
+    // console.log('stepIndex:', stepIndex);
+    // console.log('instrument:', instrument);
+    steps[stepIndex][instrument] = false;
+    // console.log('grid after\n', steps);
   };
 
-  const activateTransport = function() { // invoked with play button is clicked (or spacebar pressed)
+  const activateTransport = function(button) { // invoked with play button is clicked (or spacebar pressed)
     transportOn = true;
     playMusic();
-    //flip 'play' button to 'stop'
+    button.addClass('btn-danger').html('Stop');
     //activate 'music playing' animation
   };
 
-  const deactivateTransport = function() { //invoked when stop button is clicked (or spacebar pressed)
+  const deactivateTransport = function(button) { //invoked when stop button is clicked (or spacebar pressed)
     transportOn = false;
+    button.removeClass('btn-danger').html('Play');
   };
 
   const playMusic = async function() {
-    let counter = 0;
+    let counter = 1;
     while(transportOn) {
-      console.log('beat');
-      counter = counter > 17 ? 1 : counter + 1;
-      //triggerStepSamples(steps[counter]);
-      // triggerStepSamples(samples, ...activePads)
-      await sleep(2000);
+      console.log('step ', counter);
+      const activeInstruments = instruments.filter(instrument => steps[counter-1][instrument]);
+      triggerStepSamples(activeInstruments);
+      counter = counter > 16 ? 1 : counter + 1;
+      await sleep(125);
     }
   };
 
-  const triggerStepSamples = function(samples, ...activePads) {
-    // define activeSamples array
-    // loop through activeInstruments (as keys in samples obj)
-      // push samples to activeSamples
-    //loop through active samples
-      // new Audio('sounds/kick32.mp3').play();
+  const triggerStepSamples = function(activeInstruments) {
 
-  }
+    activeInstruments.forEach(instrument => {
+      new Audio(samples[instrument]).play();
+    })
+  };
 
-  const illuminatePad = function() {
-  	
-  }
+  const illuminatePad = function(button) {
+    button.addClass('btn-primary');
+  };
+
+  const unilluminatePad = function(button) {
+    button.removeClass('btn-primary');
+  };
 
   // DATA ---------------------------------------
   /*
@@ -140,7 +152,8 @@ $("document").ready(function(){
     instruments.forEach(instrument => {
       activePads[instrument] = false;
     })
-    return new Array(numSteps).fill(activePads);
+    let arr = new Array(numSteps).fill('x');
+    return arr.map(x => Object.assign({}, activePads));
   };  
 
   const samples = {

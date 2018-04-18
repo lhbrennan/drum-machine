@@ -11,110 +11,14 @@
   </head>
 
   <body>
-  <div class="container">
-    <div class="transport">
-      <button class="btn btn-danger play">play</button>
-      <label for="bpm">BPM</label>
-      <input type="text" name="bpm" id="bpm">
+    <div class="container">
+      <div class="transport">
+        <button class="btn btn-success play">Play</button>
+        <label for="bpm">BPM</label>
+        <input type="text" name="bpm" id="bpm">
+      </div>
+      <div class="grid"></div>                    
     </div>
-    <div class="grid">
-      <!-- <div data-instrument="kick" class="instrument-row">
-        <label class="instrument-label">Kick</label>
-        <button class="btn btn-default pad step-1">1</button>
-        <button class="btn btn-default pad step-2">1</button>
-        <button class="btn btn-default pad step-3">1</button>
-        <button class="btn btn-default pad step-4">1</button>
-        <button class="btn btn-default pad step-5">2</button>
-        <button class="btn btn-default pad step-6">2</button>
-        <button class="btn btn-default pad step-7">2</button>
-        <button class="btn btn-default pad step-8">2</button>
-        <button class="btn btn-default pad step-9">3</button>
-        <button class="btn btn-default pad step-10">3</button>
-        <button class="btn btn-default pad step-11">3</button>
-        <button class="btn btn-default pad step-12">3</button>
-        <button class="btn btn-default pad step-13">4</button>
-        <button class="btn btn-default pad step-14">4</button>
-        <button class="btn btn-default pad step-15">4</button>
-        <button class="btn btn-default pad step-16">4</button>        
-      </div>
-      <div data-instrument="clap" class="instrument-row">
-        <label class="instrument-label">Clap</label>
-        <button data-step='1' class="btn btn-default pad step-1">1</button>
-        <button class="btn btn-default pad step-2">1</button>
-        <button class="btn btn-default pad step-3">1</button>
-        <button class="btn btn-default pad step-4">1</button>
-        <button class="btn btn-default pad step-5">2</button>
-        <button class="btn btn-default pad step-6">2</button>
-        <button class="btn btn-default pad step-7">2</button>
-        <button class="btn btn-default pad step-8">2</button>
-        <button class="btn btn-default pad step-9">3</button>
-        <button class="btn btn-default pad step-10">3</button>
-        <button class="btn btn-default pad step-11">3</button>
-        <button class="btn btn-default pad step-12">3</button>
-        <button class="btn btn-default pad step-13">4</button>
-        <button class="btn btn-default pad step-14">4</button>
-        <button class="btn btn-default pad step-15">4</button>
-        <button class="btn btn-default pad step-16">4</button>         
-      </div>
-      <div data-instrument="snare" class="instrument-row">
-        <label class="instrument-label">Snare</label>
-        <button class="btn btn-default pad step-1">1</button>
-        <button class="btn btn-default pad step-2">1</button>
-        <button class="btn btn-default pad step-3">1</button>
-        <button class="btn btn-default pad step-4">1</button>
-        <button class="btn btn-default pad step-5">2</button>
-        <button class="btn btn-default pad step-6">2</button>
-        <button class="btn btn-default pad step-7">2</button>
-        <button class="btn btn-default pad step-8">2</button>
-        <button class="btn btn-default pad step-9">3</button>
-        <button class="btn btn-default pad step-10">3</button>
-        <button class="btn btn-default pad step-11">3</button>
-        <button class="btn btn-default pad step-12">3</button>
-        <button class="btn btn-default pad step-13">4</button>
-        <button class="btn btn-default pad step-14">4</button>
-        <button class="btn btn-default pad step-15">4</button>
-        <button class="btn btn-default pad step-16">4</button>         
-      </div>
-      <div data-instrument="closedHH" class="instrument-row">
-        <label class="instrument-label">closedHH</label>
-        <button class="btn btn-default pad step-1">1</button>
-        <button class="btn btn-default pad step-2">1</button>
-        <button class="btn btn-default pad step-3">1</button>
-        <button class="btn btn-default pad step-4">1</button>
-        <button class="btn btn-default pad step-5">2</button>
-        <button class="btn btn-default pad step-6">2</button>
-        <button class="btn btn-default pad step-7">2</button>
-        <button class="btn btn-default pad step-8">2</button>
-        <button class="btn btn-default pad step-9">3</button>
-        <button class="btn btn-default pad step-10">3</button>
-        <button class="btn btn-default pad step-11">3</button>
-        <button class="btn btn-default pad step-12">3</button>
-        <button class="btn btn-default pad step-13">4</button>
-        <button class="btn btn-default pad step-14">4</button>
-        <button class="btn btn-default pad step-15">4</button>
-        <button class="btn btn-default pad step-16">4</button>        
-      </div> 
-      <div data-instrument="openHH" class="instrument-row">
-        <label class="instrument-label">openHH</label>        
-        <button class="btn btn-default pad step-1">1</button>
-        <button class="btn btn-default pad step-2">1</button>
-        <button class="btn btn-default pad step-3">1</button>
-        <button class="btn btn-default pad step-4">1</button>
-        <button class="btn btn-default pad step-5">2</button>
-        <button class="btn btn-default pad step-6">2</button>
-        <button class="btn btn-default pad step-7">2</button>
-        <button class="btn btn-default pad step-8">2</button>
-        <button class="btn btn-default pad step-9">3</button>
-        <button class="btn btn-default pad step-10">3</button>
-        <button class="btn btn-default pad step-11">3</button>
-        <button class="btn btn-default pad step-12">3</button>
-        <button class="btn btn-default pad step-13">4</button>
-        <button class="btn btn-default pad step-14">4</button>
-        <button class="btn btn-default pad step-15">4</button>
-        <button class="btn btn-default pad step-16">4</button>     -->     
-      </div>                    
-    </div>
-    </div>  
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
