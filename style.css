@@ -2,8 +2,11 @@
   display: flex;
   justify-content: center;
 }*/
+.instrument-row {
+	display: flex;
+}
 
-.instrument {
+.instrument-label {
   width: 75px;
 }
 
@@ -11,3 +14,6 @@
 	width: 50px;
 }
 
+.pad {
+  margin: 5px;
+}

@@ -1,23 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>HAUS IS THE BEST</title>
-
-    <!-- Bootstrap -->
     <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
-
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
   </head>
+
   <body>
   <div class="container">
     <div class="transport">
@@ -26,8 +18,8 @@
       <input type="text" name="bpm" id="bpm">
     </div>
     <div class="grid">
-      <div class="kick">
-        <label class="instrument">Kick</label>
+      <!-- <div data-instrument="kick" class="instrument-row">
+        <label class="instrument-label">Kick</label>
         <button class="btn btn-default pad step-1">1</button>
         <button class="btn btn-default pad step-2">1</button>
         <button class="btn btn-default pad step-3">1</button>
@@ -45,8 +37,27 @@
         <button class="btn btn-default pad step-15">4</button>
         <button class="btn btn-default pad step-16">4</button>        
       </div>
-      <div class="clap">
-        <label class="instrument">Clap</label>
+      <div data-instrument="clap" class="instrument-row">
+        <label class="instrument-label">Clap</label>
+        <button data-step='1' class="btn btn-default pad step-1">1</button>
+        <button class="btn btn-default pad step-2">1</button>
+        <button class="btn btn-default pad step-3">1</button>
+        <button class="btn btn-default pad step-4">1</button>
+        <button class="btn btn-default pad step-5">2</button>
+        <button class="btn btn-default pad step-6">2</button>
+        <button class="btn btn-default pad step-7">2</button>
+        <button class="btn btn-default pad step-8">2</button>
+        <button class="btn btn-default pad step-9">3</button>
+        <button class="btn btn-default pad step-10">3</button>
+        <button class="btn btn-default pad step-11">3</button>
+        <button class="btn btn-default pad step-12">3</button>
+        <button class="btn btn-default pad step-13">4</button>
+        <button class="btn btn-default pad step-14">4</button>
+        <button class="btn btn-default pad step-15">4</button>
+        <button class="btn btn-default pad step-16">4</button>         
+      </div>
+      <div data-instrument="snare" class="instrument-row">
+        <label class="instrument-label">Snare</label>
         <button class="btn btn-default pad step-1">1</button>
         <button class="btn btn-default pad step-2">1</button>
         <button class="btn btn-default pad step-3">1</button>
@@ -64,27 +75,8 @@
         <button class="btn btn-default pad step-15">4</button>
         <button class="btn btn-default pad step-16">4</button>         
       </div>
-      <div class="snare">
-        <label class="instrument">Snare</label>
-        <button class="btn btn-default pad step-1">1</button>
-        <button class="btn btn-default pad step-2">1</button>
-        <button class="btn btn-default pad step-3">1</button>
-        <button class="btn btn-default pad step-4">1</button>
-        <button class="btn btn-default pad step-5">2</button>
-        <button class="btn btn-default pad step-6">2</button>
-        <button class="btn btn-default pad step-7">2</button>
-        <button class="btn btn-default pad step-8">2</button>
-        <button class="btn btn-default pad step-9">3</button>
-        <button class="btn btn-default pad step-10">3</button>
-        <button class="btn btn-default pad step-11">3</button>
-        <button class="btn btn-default pad step-12">3</button>
-        <button class="btn btn-default pad step-13">4</button>
-        <button class="btn btn-default pad step-14">4</button>
-        <button class="btn btn-default pad step-15">4</button>
-        <button class="btn btn-default pad step-16">4</button>         
-      </div>
-      <div class="closedHH">
-        <label class="instrument">closedHH</label>
+      <div data-instrument="closedHH" class="instrument-row">
+        <label class="instrument-label">closedHH</label>
         <button class="btn btn-default pad step-1">1</button>
         <button class="btn btn-default pad step-2">1</button>
         <button class="btn btn-default pad step-3">1</button>
@@ -102,8 +94,8 @@
         <button class="btn btn-default pad step-15">4</button>
         <button class="btn btn-default pad step-16">4</button>        
       </div> 
-      <div class="openHH">
-        <label class="instrument">openHH</label>        
+      <div data-instrument="openHH" class="instrument-row">
+        <label class="instrument-label">openHH</label>        
         <button class="btn btn-default pad step-1">1</button>
         <button class="btn btn-default pad step-2">1</button>
         <button class="btn btn-default pad step-3">1</button>
@@ -119,7 +111,7 @@
         <button class="btn btn-default pad step-13">4</button>
         <button class="btn btn-default pad step-14">4</button>
         <button class="btn btn-default pad step-15">4</button>
-        <button class="btn btn-default pad step-16">4</button>         
+        <button class="btn btn-default pad step-16">4</button>     -->     
       </div>                    
     </div>
     </div>  
