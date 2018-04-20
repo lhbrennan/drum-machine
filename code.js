@@ -1,11 +1,3 @@
-/*Inputs
-- tempo
-- swing
-- bars
-- play/stop
-- pads (active/inactive)
-*/
-
 $("document").ready(function(){
   // GLOBAL VARIABLES ---------------------------
   const instruments = [
@@ -15,33 +7,36 @@ $("document").ready(function(){
     'openHat',
     'closedHat'
   ];
-
   let transportOn = false;
-
   let resolution = 16;
   let bars = Number($("#num-bars").val());
   
   // BUILDERS ------------------------------------- 
 
   const buildDOMGrid = function(bars, resolution) {
-    console.log(arguments);
     let stepsPerBeat = resolution / 4;
     let beats = bars * 4;
-
     let grid = $(".grid");
+
     grid.empty();
+    
+    // create instrument rows
     instruments.forEach( instrument => {
       let instrumentDiv = $("<div></div>")
         .addClass('instrument-row')
         .data('instrument', instrument);
+      // add labels to each instrument row
       instrumentDiv.append(`<label class="instrument-label">${instrument}</label>`)
+      // add beat groups to each instrument row
       for(let i=1; i<=beats; i++) {
         let beatGroup = $("<div></div>").addClass('beat-group');
+        // add steps to each beat group
         for(let k=1; k<=stepsPerBeat; k++) {
           let stepNum = ((i-1)*4)+k
           let pad = $(`<button>${i}</button>`)
             .addClass('btn btn-default pad')
-            .data('step', stepNum);          
+            .data('step', stepNum)
+            .data('activated', false);          
           beatGroup.append(pad)
           instrumentDiv.append(beatGroup);
         }
@@ -50,9 +45,18 @@ $("document").ready(function(){
     })
   };
 
+  function buildStepsArray(bars=1, resolution=16) {
+    let numSteps = bars * resolution;
+    let activePads = {};
+    instruments.forEach(instrument => {
+      activePads[instrument] = false;
+    })
+    let arr = new Array(numSteps).fill('x');
+    return arr.map($ => Object.assign({}, activePads));
+  }; 
+
   // ON PAGE LOAD -------------------------------
     let steps = buildStepsArray();
-    console.log(steps);
     buildDOMGrid(bars, resolution);  
 
   // EVENT HANDLERS -----------------------------
@@ -61,11 +65,11 @@ $("document").ready(function(){
     let instrument = $(this).parent().parent().data().instrument;
   	if(steps[stepIndex][instrument]) {
       console.log(`deactivated ${instrument} pad on step ${stepIndex+1}`)
-  	  deactivatePad(stepIndex, instrument);
+  	  deactivateStep(stepIndex, instrument);
       unilluminatePad($(this));
     } else {
       console.log(`activated ${instrument} pad on step ${stepIndex+1}`)
-      activatePad(stepIndex, instrument);
+      activateStep(stepIndex, instrument);
       illuminatePad($(this));
       if(!transportOn) {
         new Audio(samples[instrument]).play();  
@@ -88,26 +92,33 @@ $("document").ready(function(){
     buildDOMGrid(numBars, resolution);
   });
 
+  $(".reset-button").click(resetPattern);
+
+  // PAD FUNCTIONS --------------------------------
+  const activateStep = function(stepIndex, instrument) {
+    steps[stepIndex][instrument] = true;
+  }; 
+
+  const deactivateStep = function(stepIndex, instrument) {
+    steps[stepIndex][instrument] = false;
+  };
+
+  const illuminatePad = function(button) {
+    button.data().activated = true;
+    button.removeClass('btn-default');
+    button.addClass('btn-primary');
+  };
+
+  const unilluminatePad = function(button) {
+    button.data().activated = false;
+    button.addClass('btn-default')
+    button.removeClass('btn-primary');
+  };
+
   // OTHER FUNCTIONS ------------------------------   
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
-
-  const activatePad = function(stepIndex, instrument) {
-    // console.log('grid before\n', steps);
-    // console.log('stepIndex:', stepIndex);
-    // console.log('instrument:', instrument);
-    steps[stepIndex][instrument] = true;
-    // console.log('grid after\n', steps);
-  };
-
-  const deactivatePad = function(stepIndex, instrument) {
-    // console.log('grid before\n', steps);
-    // console.log('stepIndex:', stepIndex);
-    // console.log('instrument:', instrument);
-    steps[stepIndex][instrument] = false;
-    // console.log('grid after\n', steps);
-  };
 
   const activateTransport = button => {
     transportOn = true;
@@ -164,33 +175,20 @@ $("document").ready(function(){
     })
   };
 
-  const illuminatePad = function(button) {
-    button.addClass('btn-primary');
-  };
-
-  const unilluminatePad = function(button) {
-    button.removeClass('btn-primary');
-  };
-
-  // DATA ---------------------------------------
-  /*
-  array that contains pad booleans and steps (active / inactive)
-  const steps = [
-    {kick: true, clap: false, snare: true, openHat: true, closeHat: false},
-    {kick: false, clap: true, snare: false, openHat: false, closeHat: false},
-    {kick: false, clap: false, snare: true, openHat: true, closeHat: false},
-    {kick: flase, clap: false, snare: false, openHat: false, closeHat: true}....
-  ]
-  */
-  function buildStepsArray(bars=1, resolution=16) {
-    let numSteps = bars * resolution;
-    let activePads = {};
-    instruments.forEach(instrument => {
-      activePads[instrument] = false;
+  function resetPattern() {
+    steps = buildStepsArray();
+    // let pads = $(".beat-group").children();
+    // console.log('pads ', pads);
+    $('.pad').each(function() {
+      if($(this).data().activated) {
+        unilluminatePad($(this));
+      }
     })
-    let arr = new Array(numSteps).fill('x');
-    return arr.map($ => Object.assign({}, activePads));
-  };  
+  };
+
+  const loadSavedPattern = function(pattern) {
+    resetPattern();
+  }
 
   const samples = {
     kick: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_kick_04.wav',
@@ -198,6 +196,5 @@ $("document").ready(function(){
     snare: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_snare_04.wav',
     closedHat: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_closedhat_01.wav',
     openHat: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_openhat_02.wav'
-  }
-
+  };
 })
