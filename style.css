@@ -19,5 +19,18 @@
 }
 
 .grid {
-	width: 800px;
+	width: 1500px;
 }
+
+.beat-group:nth-child(even) {
+	background: #577777;
+}
+
+.beat-group:nth-child(odd) {
+	background: #F2DCCA;
+}
+
+#swing, #num-bars {
+	width: 30px;
+}
+

@@ -1,5 +1,7 @@
 /*Inputs
 - tempo
+- swing
+- bars
 - play/stop
 - pads (active/inactive)
 */
@@ -15,14 +17,19 @@ $("document").ready(function(){
   ];
 
   let transportOn = false;
+
+  let resolution = 16;
+  let bars = Number($("#num-bars").val());
   
   // BUILDERS ------------------------------------- 
 
   const buildDOMGrid = function(bars, resolution) {
+    console.log(arguments);
     let stepsPerBeat = resolution / 4;
     let beats = bars * 4;
 
     let grid = $(".grid");
+    grid.empty();
     instruments.forEach( instrument => {
       let instrumentDiv = $("<div></div>")
         .addClass('instrument-row')
@@ -41,15 +48,12 @@ $("document").ready(function(){
       }
       grid.append(instrumentDiv);
     })
-    // <div data-instrument="clap" class="instrument-row">
-    //   <label class="instrument-label">Clap</label>
-    //   <button data-step='1' class="btn btn-default pad step-1">1</button>
   };
 
   // ON PAGE LOAD -------------------------------
     let steps = buildStepsArray();
     console.log(steps);
-    buildDOMGrid(1, 16);  
+    buildDOMGrid(bars, resolution);  
 
   // EVENT HANDLERS -----------------------------
   $(".pad").click(function(){
@@ -63,7 +67,9 @@ $("document").ready(function(){
       console.log(`activated ${instrument} pad on step ${stepIndex+1}`)
       activatePad(stepIndex, instrument);
       illuminatePad($(this));
-      new Audio(samples[instrument]).play();
+      if(!transportOn) {
+        new Audio(samples[instrument]).play();  
+      }
     }
   });
 
@@ -75,6 +81,11 @@ $("document").ready(function(){
     console.log('clicked the play button!')      
 	  activateTransport($(this));
     }     
+  });
+
+  $(".bars-button").click(function(){
+    const numBars = Number($("#num-bars").val());
+    buildDOMGrid(numBars, resolution);
   });
 
   // OTHER FUNCTIONS ------------------------------   
@@ -98,33 +109,58 @@ $("document").ready(function(){
     // console.log('grid after\n', steps);
   };
 
-  const activateTransport = function(button) { // invoked with play button is clicked (or spacebar pressed)
+  const activateTransport = button => {
     transportOn = true;
-    playMusic();
+    let bpm = $('#bpm').val();
+    let avgStepDuration = 60000 / ((bpm * resolution) / 4);
+    playMusic(avgStepDuration);
     button.addClass('btn-danger').html('Stop');
     //activate 'music playing' animation
   };
 
-  const deactivateTransport = function(button) { //invoked when stop button is clicked (or spacebar pressed)
+  const deactivateTransport = function(button) {
     transportOn = false;
     button.removeClass('btn-danger').html('Play');
   };
 
-  const playMusic = async function() {
+  // const playMusic = async function(avgSleepDuration) {
+  //   let swing = Number($("#swing").val());
+  //   console.log(swing);
+  //   let counter = 1;
+  //   while(transportOn) {
+  //     const activeInstruments = instruments
+  //       .filter(instrument => steps[counter-1][instrument]);
+  //     triggerStepSamples(activeInstruments);
+  //     counter = counter > 15 ? 1 : counter + 1;
+  //     let sleepDuration = counter % 2 === 0 ? avgSleepDuration * (1+(swing/10)) : avgSleepDuration * (1-(swing/10));
+  //     await sleep(sleepDuration);
+  //   }
+  // };
+
+  const playMusic = function(avgSleepDuration) {
+    let swing = Number($("#swing").val());
+    console.log(swing);
     let counter = 1;
-    while(transportOn) {
-      console.log('step ', counter);
-      const activeInstruments = instruments.filter(instrument => steps[counter-1][instrument]);
+    setInterval(function(){
+      if(!transportOn) { 
+        console.log('clearing interval!');
+        clearInterval(); 
+      }
+      const activeInstruments = instruments
+        .filter(instrument => steps[counter-1][instrument]);
       triggerStepSamples(activeInstruments);
-      counter = counter > 16 ? 1 : counter + 1;
-      await sleep(125);
-    }
+      counter = counter > 15 ? 1 : counter + 1;
+    }, avgSleepDuration)
   };
 
   const triggerStepSamples = function(activeInstruments) {
 
     activeInstruments.forEach(instrument => {
-      new Audio(samples[instrument]).play();
+      let audio = new Audio(samples[instrument]);
+      if(instrument === 'openHat' || instrument === 'closedHat') {
+        audio.volume -= .45;
+      }
+      audio.play();
     })
   };
 
@@ -153,13 +189,15 @@ $("document").ready(function(){
       activePads[instrument] = false;
     })
     let arr = new Array(numSteps).fill('x');
-    return arr.map(x => Object.assign({}, activePads));
+    return arr.map($ => Object.assign({}, activePads));
   };  
 
   const samples = {
     kick: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_kick_04.wav',
     clap: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_clap.wav',
-    snare: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_snare_04.wav'
+    snare: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_snare_04.wav',
+    closedHat: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_closedhat_01.wav',
+    openHat: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_openhat_02.wav'
   }
 
 })
