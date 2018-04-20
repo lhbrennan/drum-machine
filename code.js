@@ -141,10 +141,10 @@ $("document").ready(function(){
     let swing = Number($("#swing").val());
     console.log(swing);
     let counter = 1;
-    setInterval(function(){
+    let interval = setInterval(function(){
       if(!transportOn) { 
         console.log('clearing interval!');
-        clearInterval(); 
+        clearInterval(interval); 
       }
       const activeInstruments = instruments
         .filter(instrument => steps[counter-1][instrument]);
