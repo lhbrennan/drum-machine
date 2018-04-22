@@ -1,3 +1,6 @@
+// const samples = require('./samples.js')
+// const examples = require('./examples.js');
+
 $("document").ready(function(){
   // GLOBAL VARIABLES ---------------------------
   const instruments = [
@@ -10,6 +13,7 @@ $("document").ready(function(){
   let transportOn = false;
   let resolution = 16;
   let bars = Number($("#num-bars").val());
+  let activeStep = null;
   
   // BUILDERS ------------------------------------- 
 
@@ -94,6 +98,14 @@ $("document").ready(function(){
 
   $(".reset-button").click(resetPattern);
 
+  $(".example").click(function(){
+    deactivateTransport();
+    const exampleName = $(this).data().example;
+    console.log(`clicked example ${exampleName}`);
+    const song = examples[exampleName];
+    loadSavedSong(song);
+  });
+
   // PAD FUNCTIONS --------------------------------
   const activateStep = function(stepIndex, instrument) {
     steps[stepIndex][instrument] = true;
@@ -115,15 +127,23 @@ $("document").ready(function(){
     button.removeClass('btn-primary');
   };
 
-  // OTHER FUNCTIONS ------------------------------   
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+  const illuminateAllActivePads = function(steps) {
+    steps.forEach(step => {
+      for(let keys in step) {
+        if(step[key]) {
+          //get button
+            //let button = $(".instrument-row")
+          illuminatePad(button);
+        }
+      }
+    });
+  };
 
+  // PLAYBACK FUNCTIONS -------------------------   
   const activateTransport = button => {
     transportOn = true;
-    let bpm = $('#bpm').val();
-    let avgStepDuration = 60000 / ((bpm * resolution) / 4);
+    const bpm = $('#bpm').val();
+    const avgStepDuration = 60000 / ((bpm * resolution) / 4);
     playMusic(avgStepDuration);
     button.addClass('btn-danger').html('Stop');
     //activate 'music playing' animation
@@ -134,38 +154,7 @@ $("document").ready(function(){
     button.removeClass('btn-danger').html('Play');
   };
 
-  // const playMusic = async function(avgSleepDuration) {
-  //   let swing = Number($("#swing").val());
-  //   console.log(swing);
-  //   let counter = 1;
-  //   while(transportOn) {
-  //     const activeInstruments = instruments
-  //       .filter(instrument => steps[counter-1][instrument]);
-  //     triggerStepSamples(activeInstruments);
-  //     counter = counter > 15 ? 1 : counter + 1;
-  //     let sleepDuration = counter % 2 === 0 ? avgSleepDuration * (1+(swing/10)) : avgSleepDuration * (1-(swing/10));
-  //     await sleep(sleepDuration);
-  //   }
-  // };
-
-  const playMusic = function(avgSleepDuration) {
-    let swing = Number($("#swing").val());
-    console.log(swing);
-    let counter = 1;
-    let interval = setInterval(function(){
-      if(!transportOn) { 
-        console.log('clearing interval!');
-        clearInterval(interval); 
-      }
-      const activeInstruments = instruments
-        .filter(instrument => steps[counter-1][instrument]);
-      triggerStepSamples(activeInstruments);
-      counter = counter > 15 ? 1 : counter + 1;
-    }, avgSleepDuration)
-  };
-
   const triggerStepSamples = function(activeInstruments) {
-
     activeInstruments.forEach(instrument => {
       let audio = new Audio(samples[instrument]);
       if(instrument === 'openHat' || instrument === 'closedHat') {
@@ -175,6 +164,60 @@ $("document").ready(function(){
     })
   };
 
+  // const loopThroughSteps = function(startingCounter, avgSleepDuration){
+  //   let counter = startingCounter;
+  //   let interval = setInterval(function(){
+  //     if(!transportOn) { clearInterval(interval); }
+  //     const activeInstruments = instruments.filter(instrument => steps[counter-1][instrument]);
+  //     triggerStepSamples(activeInstruments);
+  //     counter = counter > 14 ? startingCounter : counter + 2;
+  //   }, avgSleepDuration*2)
+  // };
+
+  // const playMusic = function(avgSleepDuration) {
+  //   let swing = Number($("#swing").val());
+  //   let swingDelay = avgSleepDuration * (1 + (swing / 10));
+  //   console.log('avgSleepDuration: ', avgSleepDuration);
+  //   console.log('swingDelay: ', swingDelay);
+  //   loopThroughSteps(1, avgSleepDuration);
+  //   setTimeout(loopThroughSteps(2, avgSleepDuration), swingDelay);
+  // }; 
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  const playMusic = async function(avgSleepDuration) {
+    let swing = Number($("#swing").val());
+    let counter = 1;
+    while(transportOn) {
+      const activeInstruments = instruments
+        .filter(instrument => steps[counter-1][instrument]);
+      triggerStepSamples(activeInstruments);
+      counter = counter > 15 ? 1 : counter + 1;
+      let sleepDuration = counter % 2 === 0 ? avgSleepDuration * (1+(swing/10)) : avgSleepDuration * (1-(swing/10));
+      await sleep(sleepDuration);
+    }
+  };
+
+  // const playMusic = function(avgSleepDuration) {
+  //   let swing = Number($("#swing").val());
+  //   let counter = 1;
+
+  //   let interval = setInterval(function(){
+  //     if(!transportOn) { 
+  //       console.log('clearing interval!');
+  //       clearInterval(interval); 
+  //     }
+  //     const activeInstruments = instruments
+  //       .filter(instrument => steps[counter-1][instrument]);
+  //     triggerStepSamples(activeInstruments);
+  //     counter = counter > 15 ? 1 : counter + 1;
+  //   }, avgSleepDuration)
+
+  // };
+
+  // OTHER FUNCTIONS ---------------------------- 
   function resetPattern() {
     steps = buildStepsArray();
     // let pads = $(".beat-group").children();
@@ -186,15 +229,98 @@ $("document").ready(function(){
     })
   };
 
-  const loadSavedPattern = function(pattern) {
+  const loadSavedSong = function(song) {
     resetPattern();
+    steps = song.steps;
+    $("#swing").val(song.swing)
+    $("#bpm").val(song.bpm);
+    $("#bars").val(song.bars);
+    // illuminateAllActivePads();
   }
 
-  const samples = {
-    kick: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_kick_04.wav',
-    clap: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_clap.wav',
-    snare: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_snare_04.wav',
-    closedHat: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_closedhat_01.wav',
-    openHat: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_openhat_02.wav'
-  };
+  const illuminateActiveBeatGroup = function() {
+
+  }
+
 })
+// SAMPLES --------------------------------------
+const samples = {
+  kick: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_kick_04.wav',
+  clap: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_clap.wav',
+  snare: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_snare_04.wav',
+  closedHat: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_closedhat_01.wav',
+  openHat: 'samples/Sample_Magic_Roland_TR_909/SampleMagic_tr909_openhat_02.wav'
+};
+
+// EXAMPLES --------------------------------------
+const examples = {
+  one: {
+    steps: [
+      {kick: true, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: true},
+      {kick: false, clap: false, snare: false, openHat: true, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: true, clap: true, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: true, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: true, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: true, clap: true, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: true},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: true, openHat: false, closedHat: true}
+    ],
+    bpm: 125,
+    swing: 3,
+    bars: 1
+  },
+  two: {
+    steps: [
+      {kick: true, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: true},
+      {kick: false, clap: false, snare: false, openHat: true, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: true, clap: true, snare: true, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: true, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: true, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: true, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: true, clap: true, snare: true, openHat: false, closedHat: true},
+      {kick: true, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: true, closedHat: false},
+      {kick: false, clap: false, snare: true, openHat: false, closedHat: false}
+    ],
+    bpm: 125,
+    swing: 3,
+    bars: 1
+  },
+  three: {
+    steps: [
+      {kick: true, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: true, clap: false, snare: true, openHat: false, closedHat: true},
+      {kick: true, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: true, clap: true, snare: true, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: true, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: true, clap: false, snare: false, openHat: true, closedHat: false},
+      {kick: false, clap: false, snare: true, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: true, clap: true, snare: true, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false},
+      {kick: false, clap: false, snare: false, openHat: false, closedHat: false}
+    ],
+    bpm: 110,
+    swing: 2,
+    bars: 1
+  }
+}
