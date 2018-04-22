@@ -14,6 +14,7 @@ $("document").ready(function(){
   let resolution = 16;
   let bars = Number($("#num-bars").val());
   let activeStep = null;
+  let $playStop = $(".play");
   
   // BUILDERS ------------------------------------- 
 
@@ -65,8 +66,9 @@ $("document").ready(function(){
 
   // EVENT HANDLERS -----------------------------
   $(".pad").click(function(){
-    let stepIndex = Number($(this).data().step)-1;
-    let instrument = $(this).parent().parent().data().instrument;
+    let stepIndex = getPadStepIndex($(this));
+    let instrument = getPadInstrument($(this));
+
   	if(steps[stepIndex][instrument]) {
       console.log(`deactivated ${instrument} pad on step ${stepIndex+1}`)
   	  deactivateStep(stepIndex, instrument);
@@ -81,13 +83,13 @@ $("document").ready(function(){
     }
   });
 
-  $(".play").click(function(){
+  $playStop.click(function(){
     if(transportOn) {
     console.log('clicked the stop button!')      
-	  deactivateTransport($(this));
+	  deactivateTransport();
     } else {
     console.log('clicked the play button!')      
-	  activateTransport($(this));
+	  activateTransport();
     }     
   });
 
@@ -107,6 +109,14 @@ $("document").ready(function(){
   });
 
   // PAD FUNCTIONS --------------------------------
+  const getPadStepIndex = function(pad){
+    return Number(pad.data().step)-1;
+  }
+
+  const getPadInstrument = function(pad){
+    return pad.parent().parent().data().instrument;
+  }
+
   const activateStep = function(stepIndex, instrument) {
     steps[stepIndex][instrument] = true;
   }; 
@@ -127,31 +137,39 @@ $("document").ready(function(){
     button.removeClass('btn-primary');
   };
 
-  const illuminateAllActivePads = function(steps) {
-    steps.forEach(step => {
-      for(let keys in step) {
-        if(step[key]) {
-          //get button
-            //let button = $(".instrument-row")
-          illuminatePad(button);
-        }
+  const illuminateAllActivePads = function() {
+    let pads = $(".pad");
+    pads.each( function() {
+      let stepIndex = getPadStepIndex($(this));
+      let instrument = getPadInstrument($(this));
+      if(steps[stepIndex][instrument]){
+        illuminatePad($(this));
       }
-    });
+    })
+
+    // steps.forEach((step, index) => {
+    //   for(let keys in step) {
+    //     if(step[key]) {
+    //       let button = $(".instrument-row")
+    //       illuminatePad(button);
+    //     }
+    //   }
+    // });
   };
 
   // PLAYBACK FUNCTIONS -------------------------   
-  const activateTransport = button => {
+  const activateTransport = () => {
     transportOn = true;
     const bpm = $('#bpm').val();
     const avgStepDuration = 60000 / ((bpm * resolution) / 4);
     playMusic(avgStepDuration);
-    button.addClass('btn-danger').html('Stop');
+    $playStop.addClass('btn-danger').html('Stop');
     //activate 'music playing' animation
   };
 
-  const deactivateTransport = function(button) {
+  const deactivateTransport = function() {
     transportOn = false;
-    button.removeClass('btn-danger').html('Play');
+    $playStop.removeClass('btn-danger').html('Play');
   };
 
   const triggerStepSamples = function(activeInstruments) {
@@ -235,11 +253,11 @@ $("document").ready(function(){
     $("#swing").val(song.swing)
     $("#bpm").val(song.bpm);
     $("#bars").val(song.bars);
-    // illuminateAllActivePads();
+    illuminateAllActivePads();
   }
 
   const illuminateActiveBeatGroup = function() {
-
+    // stuff
   }
 
 })
@@ -296,8 +314,8 @@ const examples = {
       {kick: false, clap: false, snare: false, openHat: true, closedHat: false},
       {kick: false, clap: false, snare: true, openHat: false, closedHat: false}
     ],
-    bpm: 125,
-    swing: 3,
+    bpm: 115,
+    swing: 4,
     bars: 1
   },
   three: {
